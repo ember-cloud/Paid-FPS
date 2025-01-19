@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Ember Cloud</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background-color: #000; /* Black background */
+      color: white; /* White text for contrast */
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      margin: 0;
+      position: relative; /* Ensure content is on top of the canvas */
+    }
+    .container {
+      background-color: #1e1e1e; /* Dark grey background for the container */
+      padding: 20px;
+      border-radius: 8px;
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+      width: 100%;
+      max-width: 400px;
+      text-align: center;
+      position: relative; /* Keeps the container above the canvas */
+      z-index: 2; /* Ensures the container is above the canvas */
+    }
+    .container h2 {
+      margin-bottom: 15px;
+    }
+    .action-button {
+      padding: 10px 20px;
+      background-color: #9b4dca;
+      color: white;
+      border: none;
+      border-radius: 5px;
+      font-size: 16px;
+      cursor: pointer;
+      margin-top: 20px;
+      text-decoration: none;
+      display: inline-block;
+    }
+    .action-button:hover {
+      background-color: #7a3e99;
+    }
+    #mycanvas {
+      position: absolute;
+      background-color: black;
+      width: 100%;
+      height: 100%;
+      top: 0;
+      left: 0;
+      z-index: 1; /* Ensure canvas is below other content */
+    }
+  </style>
+</head>
+<body>
+  <!-- Canvas for the constellation effect -->
+  <canvas id="mycanvas"></canvas>
+
+  <!-- Main content container -->
+  <div class="container">
+    <h2>Download FPS Booster</h2>
+    <a href="https://github.com/ember-cloud/FPS-Boost/raw/refs/heads/main/FPS%20Booster%20(FREE).exe" class="action-button">Download</a>
+  </div>
+
+  <script>
+    // Canvas and constellation effect code
+    const canvas = document.getElementById('mycanvas');
+    const ctx = canvas.getContext('2d');
+    canvas.width = window.innerWidth;
+    canvas.height = window.innerHeight;
+
+    let particles = [];
+
+    window.addEventListener('resize', function () {
+      canvas.width = window.innerWidth;
+      canvas.height = window.innerHeight;
+    });
+
+    const mouse = {
+      x: undefined,
+      y: undefined,
+    };
+
+    canvas.addEventListener('click', function (e) {
+      mouse.x = e.x;
+      mouse.y = e.y;
+      for (let i = 0; i < 5; i++) {
+        particles.push(new Particle());
+      }
+    });
+
+    canvas.addEventListener('mousemove', function (e) {
+      mouse.x = e.x;
+      mouse.y = e.y;
+      for (let i = 0; i < 5; i++) {
+        particles.push(new Particle());
+      }
+    });
+
+    class Particle {
+      constructor() {
+        this.x = mouse.x;
+        this.y = mouse.y;
+        this.speedX = Math.random() * 1.5 - 0.75;
+        this.speedY = Math.random() * 1.5 - 0.75;
+        this.color = 'hsl(270, 100%, 50%)';
+        this.size = Math.random() * 5 + 1;
+      }
+      update() {
+        this.x += this.speedX;
+        this.y += this.speedY;
+        this.size -= 0.1;
+      }
+      draw() {
+        ctx.fillStyle = this.color;
+        ctx.beginPath();
+        ctx.arc(this.x, this.y, 5, 0, Math.PI * 2);
+        ctx.fill();
+      }
+    }
+
+    function handleParticles() {
+      for (let i = 0; i < particles.length; i++) {
+        particles[i].update();
+        particles[i].draw();
+        for (let j = i + 1; j < particles.length; j++) {
+          const dx = particles[j].x - particles[i].x;
+          const dy = particles[j].y - particles[i].y;
+          const distance = dx * dx + dy * dy;
+          if (distance < 10000) {
+            ctx.beginPath();
+            ctx.strokeStyle = particles[i].color;
+            ctx.lineWidth = 0.3;
+            ctx.moveTo(particles[i].x, particles[i].y);
+            ctx.lineTo(particles[j].x, particles[j].y);
+            ctx.stroke();
+          }
+        }
+        if (particles[i].size < 0.3) {
+          particles.splice(i, 1);
+          i--;
+        }
+      }
+    }
+
+    function animate() {
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      handleParticles();
+      requestAnimationFrame(animate);
+    }
+    animate();
+  </script>
+</body>
+</html>
